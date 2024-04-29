@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>VinithVisualTheatere</title>
+<style>
+    body {
+        font-family: Arial, sans-serif; /* Sets a clean and modern font */
+        background-color: #f4f4f4; /* Light grey background for a subtle look */
+        margin: 0;
+        padding: 10px;
+    }
+
+    header, footer {
+        background-color: #333; /* Dark background for header and footer */
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+    }
+
+    form {
+        background-color: white;
+        padding: 20px;
+        margin-top: 20px;
+        border-radius: 8px; /* Rounded corners for the form */
+        box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Subtle shadow for 3D effect */
+    }
+
+    label {
+        display: block; /* Makes labels take a full width */
+        margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    select {
+        width: calc(100% - 22px); /* Full width while accounting for padding and borders */
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    button {
+        background-color: #5C67F2; /* A pleasing blue */
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    button:hover {
+        background-color: #5058E5; /* Slightly darker blue on hover */
+    }
+
+    #movieselectionSection, #showtimesSection {
+        margin-top: 20px;
+    }
+
+    #showtimes div {
+        margin-bottom: 10px;
+    }
+    #screen {
+            text-align: center;
+            margin: 20px;
+            font-size: 20px;
+        }
+    .row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+    .seat {
+            width: 30px;
+            height: 30px;
+            background-color: #ccc;
+            margin: 3px;
+            border: 1px solid black;
+            cursor: pointer;
+        }
+    .seat.selected {
+            background-color: #66CC33;  
+        }
+</style>
+
+</head>
+<body>
+<header>
+    <h1>Welcome to Vinith Visual theatere</h1> 
+</header>
+<form id="details">
+    <h2>Enter your details to Select the Movie</h2>
+    <label for="name">Name </label>
+    <input type="text" id="name" name="name" required><br><br>
+    <label for="emailid">Emailid</label>
+    <input type="email" id="emailid" name="emailid" required><br><br>
+    <label for="contact">Contact Number</label>
+    <input type="tel" id="userPhone" name="userPhone" pattern="[0-9]{10}" required title="Phone number should be 10 digits"><br><br>
+    <button type="button" onclick="Showmovieselection()">Continue</button>
+
+</form><br>
+
+<div id ="movieselectionSection" >
+    <label for="movieSelection"> Select the Movie :</label>
+    <select id="movieSelection" onchange="Showtimings()"></select>
+    <button type="button" onclick="goBackToDetails()">Back to Details</button>
+</div>
+
+<div id="showtimesSection" style="display:none;">
+    <h3>Show times and screens</h3>
+    <div id = "showtimes"></div>
+    <button type="button" onclick="continueBooking()">Continue booking</button>
+    <button type="button" onclick="goBackToMovies()">Back to Movies</button>
+    
+</div>
+<div id="seatSelectionSection" style="display:none;">
+    <div id="screen">YOUR SCREEN HERE</div>
+    <div id="seatsContainer"></div>
+    <button onclick="finalizeBooking()">Finalize Booking</button>
+    <button onclick="goBackToShowtimes()">Back to Showtimes</button>
+</div>
+<footer>
+        <p>© 2024 Vinith Visual Theatre. All rights reserved.</p>
+</footer>
+<script>
+    const seats=[
+    ['A1', 'A2', 'A3', 'A4'],
+        ['B1', 'B2', 'B3', 'B4'],
+        ['C1', 'C2', 'C3', 'C4']
+]; 
+    const movies =[
+        {id : "M1" , name : "Godzilla vs Kong",showTimes: [{time: "12:00 PM", screen: "Screen 1"}, {time: "6:00 PM", screen: "Screen 3"}]},
+        {id : "M2" , name : "Avatar",showTimes: [{time: "3:00 PM", screen: "Screen 2"}, {time: "9:00 PM", screen: "Screen 1"}]},
+        {id : "M3" , name : "Mission impossible", showTimes: [{time: "1:00 PM", screen: "Screen 2"}, {time: "7:00 PM", screen: "Screen 4"}]}
+    ];
+    function showSeatSelection() {
+        const container = document.getElementById('seatsContainer');
+        container.innerHTML = '';  // Clear previous seats
+        seats.forEach((row, index) => {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'row';
+            row.forEach(seat => {
+                const seatDiv = document.createElement('button');
+                seatDiv.className = 'seat';
+                seatDiv.textContent = seat;
+                seatDiv.onclick = () => selectSeat(seatDiv);
+                rowDiv.appendChild(seatDiv);
+            });
+            container.appendChild(rowDiv);
+        });
+        document.getElementById('seatSelectionSection').style.display = 'block';
+    }
+
+    function selectSeat(seat) {
+        seat.classList.toggle('selected');
+    }
+
+    function finalizeBooking() {
+        const selectedSeats = document.querySelectorAll('.seat.selected');
+        const selectedSeatIds = Array.from(selectedSeats).map(seat => seat.textContent);
+        alert('You have selected: ' + selectedSeatIds.join(', '));
+    }
+
+    function goBackToShowtimes() {
+        document.getElementById('seatSelectionSection').style.display = 'none';
+        // Assume there's a function to show the showtimes section
+        // showShowtimesSection();  // Uncomment or modify according to your app structure
+    }
+
+    function MovieDropdown(){
+             const getmovie =document.getElementById("movieSelection");
+             getmovie.innerHTML = '';
+
+             movies.forEach(movie => {const getoption = document.createElement("option");
+
+             getoption.value = movie.id;
+             getoption.textContent = movie.name;
+             getmovie.appendChild(getoption);
+            } );
+    }
+
+    function Showmovieselection(){
+        const checkdetails =document.getElementById("details");
+        
+        if(checkdetails.checkValidity()){
+            checkdetails.style.display = 'none'; // Hide form
+            document.getElementById('movieSelection').style.display = 'block'; // Show movie selection
+            MovieDropdown(); // Populate dropdown after showing it
+
+            
+        }else{
+            checkdetails.reportValidity();
+        }
+
+    };
+    function Showtimings(){
+        const selectedMovieId = document.getElementById("movieSelection").value;
+        const selectedMovie = movies.find(movie => movie.id === selectedMovieId);
+        const timesAndScreens = document.getElementById("showtimes");
+        timesAndScreens.innerHTML = '';  // Clear previous entries
+
+        if (selectedMovie) {
+            selectedMovie.showTimes.forEach(show => {
+                const showInfo = document.createElement("div");
+                showInfo.innerHTML = `<label><input type="radio" name="showTime" value="${show.time + ' ' + show.screen}" required>${show.time} at ${show.screen}</label>`;
+                timesAndScreens.appendChild(showInfo);
+            });
+            document.getElementById('showtimesSection').style.display = 'block';  // Show show times
+            document.getElementById('movieselectionSection').style.display = 'none';
+        }
+
+    };
+ function continueBooking() {
+        const showtimesForm = document.getElementById("showtimes");
+        // Ensure the user has selected a show time before proceeding
+        if (showtimesForm.querySelector('input[name="showTime"]:checked')) {
+            const selectedShow = document.querySelector('input[name="showTime"]:checked').value;
+            alert('You have selected: ' + selectedShow);  // Optionally inform the user
+
+            // Hide the current show times section
+            document.getElementById('showtimesSection').style.display = 'none';
+
+            // Display the seat selection section
+            showSeatSelection(); // Ensure the seat selection is initialized correctly
+        } else {
+            alert('Please select a show time before continuing.'); // Prompt user to select a show time if not done
+        }
+    };
+    function goBackToDetails() {
+    document.getElementById('movieselectionSection').style.display = 'none';
+    document.getElementById('details').style.display = 'block';
+    document.getElementById('showtimesSection').style.display = 'none'; // Ensure to hide showtimes when going back to details
+};
+
+function goBackToMovies() {
+    document.getElementById('showtimesSection').style.display = 'none';
+    document.getElementById('movieselectionSection').style.display = 'block';
+    document.getElementById('details').style.display = 'none'; // Ensure to hide details when going back to movies
+}
+</script>
+</body>
+</html>
